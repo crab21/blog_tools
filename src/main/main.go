@@ -75,17 +75,15 @@ func initCos() {
 }
 
 func DescribeBucketList() []cos.Object {
-	list, resp, err := info.cc.Bucket.Get(context.Background(), nil)
+	list, _, err := info.cc.Bucket.Get(context.Background(), nil)
 	if err != nil {
 		panic(err)
 	}
-	bs, _ := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-	fmt.Printf("%s\n", string(bs))
-	fmt.Println("\n\n")
-	for _, v := range list.Contents {
-		fmt.Println("del cos file:  ", v.Key)
-	}
+	// bs, _ := ioutil.ReadAll(resp.Body)
+	// resp.Body.Close()
+	// fmt.Printf("%s\n", string(bs))
+	// fmt.Println("\n\n")
+
 	if list == nil && len(list.Contents) == 0 {
 		return nil
 	}
@@ -97,6 +95,8 @@ func DelBucketList(object []cos.Object) error {
 		if !excludeDirPass(v.Key) {
 			continue
 		}
+
+		fmt.Println("del cos file:  ", v.Key)
 
 		_, err := info.cc.Object.Delete(context.Background(), v.Key, nil)
 		if err != nil {
@@ -139,6 +139,7 @@ func UploadMultiObject(result map[string]string) {
 		if !excludeDirPass(v) {
 			continue
 		}
+		fmt.Println("upload cos file:  ", v)
 		info.cc.Object.PutFromFile(context.Background(), v, v, &cos.ObjectPutOptions{})
 	}
 
@@ -189,7 +190,7 @@ func GetDirFileNameAndPath(result map[string]string, path string) map[string]str
 			continue
 		}
 		result[path+"/"+v.Name()] = v.Name()
-		fmt.Println("upload file:  ", path+"/"+v.Name())
+		// fmt.Println("upload file:  ", path+"/"+v.Name())
 	}
 	return result
 }
